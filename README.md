@@ -5,6 +5,6 @@ This project analyzes sales data for EmporiUm, a fictional retail company.
 Using SQL and Excel, I will examine sales performance in the Midwest region, identify revenue trends, 
 compare sales performance, and provide recommendations for improving future sales.
 
-Selected Sales Territory: Midwest Region
+Selected Sales Territory: New York
 
 Capstone Video: [Link to be added upon completion]
