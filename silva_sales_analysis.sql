@@ -1,58 +1,149 @@
--- CHOSEN REGION: West (Colorado and Online)--
-select*
-from store_locations
-where state like 'colorado'
-;
 select *
-from online_sales
+From store_locations
+where State like 'New York'
+order by StoreId asc
 ;
-select*
-from management;
+
+
+select sum(Sale_Amount)
+from store_sales
+where Store_ID between 840 and 851
+-- total sales from 01-01-2022 to 12-31-2025 = 4,330,817.09
+;
+
+
+select sum(Sale_Amount), year(Transaction_Date), month(Transaction_Date)
+from store_sales
+where Store_ID between 840 and 851
+group by year(Transaction_Date), month(Transaction_Date)
+-- breaks down revenue by month and year
+;
+
 
 select *
-from store_sales
+from management
+-- conneticut is included in the East
 ;
+
+
+select *
+From store_locations
+where State = 'Connecticut'
+-- gives store ID of stores in Connecticut which is also in the East Region
+;
+
+
 select sum(Sale_Amount)
 from store_sales
-Where Store_ID between 701 and 718
--- Store Sales = 6,422,632.22
-;
-select sum(SalesTotal)
-from online_sales
--- total revenue from Online Sales = 68,004,827.05
--- total revenue of West Region= 74,427,459.27 from 01-01-2022 to 12-31-2025
-;
-select sales_year, sum(revenue)
-from(
-	select year(Transaction_Date) as sales_year, Sale_Amount as revenue
-	from store_sales
-	Where Store_ID between 701 and 718
-	union all
-	select year(Date), SalesTotal
-    from online_sales
-) as combined_sales
-	group by sales_year
-    order by sales_year
--- revenue by year
-;
-select sales_month, sales_year, sum(revenue)
-from(
-	select month(Transaction_Date) as sales_month,
-    year(Transaction_Date) as sales_year, Sale_Amount as revenue
-	from store_sales
-	Where Store_ID between 701 and 718
-	union all
-	select month(Date), year(Date), SalesTotal
-    from online_sales
-) as combined_sales
-	group by sales_year, sales_month
-    order by sales_year, sales_month
--- Revenue By Month
-;
+where Store_ID between 865 and 872
+UNION ALL 
 select sum(Sale_Amount)
 from store_sales
-where Store_ID between 701 and 718
+where Store_ID between 840 and 851
+-- connecticut total revenue= 2,392,222.44, approximately $2 million less than New York 
 ;
-select sum(SalesTotal)
-from online_sales
--- Last two queries are the totals of the distinct territories in the West Region
+
+
+select sum(total_rev)
+	from (select sum(Sale_Amount) as total_rev
+	from store_sales
+	where Store_ID between 865 and 872
+	UNION ALL
+	select sum(Sale_Amount) as total_rev
+	from store_sales
+	where Store_ID between 840 and 851
+) as region_rev
+-- Total Region Revenue=6,723,039.53
+;
+
+
+select products.Categoryid, Avg(store_sales.Sale_Amount) As average_transaction
+from store_sales
+Join products
+	ON store_sales.Prod_Num = products.ProdNum
+where store_sales.Store_ID between 840 and 851
+Group By products.Categoryid
+order by average_transaction desc
+-- Average transaction amount by category
+;
+
+
+select count(id), year(Transaction_Date), month(Transaction_Date)
+from store_sales
+where Store_ID between 840 and 851
+group by year(Transaction_Date), month(Transaction_Date)
+-- shows number of transactions per month
+;
+
+
+select products.Categoryid, store_sales.Store_ID,
+count(store_sales.id) As num_of_transactions,
+year(store_sales.Transaction_Date), month(store_sales.Transaction_Date)
+from store_sales
+Join products
+	ON store_sales.Prod_Num = products.ProdNum
+where store_sales.Store_ID between 840 and 851
+Group By products.Categoryid,year(store_sales.Transaction_Date), 
+month(store_sales.Transaction_Date),Store_ID
+order by year(store_sales.Transaction_Date), month(store_sales.Transaction_Date)
+
+
+-- Shows number of transactions per month by category
+;
+
+
+
+select count(id)
+from store_sales
+where Store_ID between 840 and 851
+-- total transactions in territory
+;
+
+
+select sum(Sale_Amount) as sales_performance, Store_ID
+From store_sales
+where Store_ID between 840 and 851
+group by Store_ID
+order by sales_performance asc
+-- ranks each store's sales performance
+;
+
+
+select Round(sum(Sale_Amount)/count(distinct Store_ID),2) as avg_sales
+from store_sales
+where Store_ID between 840 and 851
+-- Average Sales of all stores= 360,901.42
+;
+
+
+select count(id), Store_ID
+from store_sales
+where Store_ID between 840 and 851
+group by Store_ID
+order by count(id) asc
+
+-- Ny recommendation is to focus sales attention on store 851, 
+-- priortizing improving sales at store 851. Store 851 falls way below average while 
+-- also being the only store to have revenue below $300,000. It also has the fewest amount of transactions; for
+-- although it does not deviate greatly from the number of transactions at 
+-- better performing stores. There could be a higher demand for lower priced items in the store's area or
+-- less emphasis on selling higher priced items. 
+;
+select Month(Transaction_Date), Year(Transaction_Date),Count(id),Store_ID
+from store_sales
+where Store_ID between 840 and 851
+group by Store_ID, Month(Transaction_Date), Year(Transaction_Date)
+order by Month(Transaction_Date), Year(Transaction_Date),Store_ID 
+
+-- breaks down # of transactions at each store per month
+;
+
+select products.Categoryid, store_sales.Store_ID,
+count(store_sales.id) As num_of_transactions,
+year(store_sales.Transaction_Date)
+from store_sales
+Join products
+	ON store_sales.Prod_Num = products.ProdNum
+where store_sales.Store_ID between 840 and 851 and Transaction_Date like '%2025%'
+Group By products.Category,year(store_sales.Transaction_Date),store_sales.Store_ID
+order by year(store_sales.Transaction_Date), products.Categoryid
