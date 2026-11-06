@@ -7,4 +7,4 @@ compare sales performance, and provide recommendations for improving future sale
 
 Selected Sales Territory: New York
 
-Capstone Video: [Link to be added upon completion]
+Capstone Video: https://youtu.be/Y29YNUSVbXo
